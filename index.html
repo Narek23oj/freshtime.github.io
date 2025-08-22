@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreshTime Խաղարկություն</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        overflow: hidden;
+    }
+    h1 {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .container {
+        max-width: 400px;
+        background: white;
+        padding: 20px;
+        margin: 60px auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 2;
+    }
+    input, button {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+    button {
+        background: #28a745;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .tickets {
+        text-align: center;
+        font-size: 18px;
+        margin-top: 15px;
+    }
+    .background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 1;
+    }
+    .cup {
+        position: absolute;
+        width: 100px;
+        opacity: 0.3;
+        animation: float 10s linear infinite;
+    }
+    @keyframes float {
+        0% { transform: translateY(100vh) rotate(0deg); }
+        100% { transform: translateY(-150px) rotate(360deg); }
+    }
+</style>
+</head>
+<body>
+    <div class="background" id="background"></div>
+
+    <h1>FreshTime Խաղարկություն</h1>
+    <div class="container">
+        <input type="email" id="email" placeholder="Մուտքագրեք ձեր Email-ը">
+        <input type="text" id="code" placeholder="Մուտքագրեք կոդը">
+        <button onclick="submitCode()">Ուղարկել</button>
+        <div class="tickets" id="tickets">Ձեր տոմսերը՝ 0</div>
+    </div>
+
+<script>
+    // ✅ 200 եզակի կոդ + admin code
+    const VALID_CODES = [
+        928849, 953643, 503101, 852509, 164795, 973514, 232232, 833018, 531816, 975112,
+        544019, 648371, 853251, 344703, 471790, 460866, 809555, 610176, 738580, 348468,
+        700472, 129207, 659791, 694720, 435731, 721090, 956741, 666312, 288828, 828385,
+        867618, 354923, 161715, 271487, 789720, 996171, 293580, 174349, 874281, 332445,
+        673606, 363937, 266923, 312579, 334389, 538363, 327495, 596986, 280101, 829095,
+        382939, 741205, 811670, 121236, 498620, 873094, 539184, 947381, 637281, 402938,
+        723495, 562817, 803914, 920471, 514283, 109384, 627190, 761982, 374918, 895301,
+        238471, 498376, 672839, 837291, 485712, 912374, 748291, 653728, 491203, 572819,
+        371492, 856230, 193847, 482910, 651283, 748392, 584726, 302918, 467239, 592830,
+        817293, 403928, 129384, 560192, 837491, 928374, 659283, 473829, 192837, 384756,
+        918273, 647382, 238475, 564738, 837291, 473920, 918374, 659102, 837465, 273849,
+        908172, 374829, 837192, 293847, 837465, 918273, 564738, 918374, 293847, 837192,
+        918273, 564738, 837291, 928374, 659283, 473829, 192837, 384756, 918273, 647382,
+        238475, 564738, 837291, 473920, 918374, 659102, 837465, 273849, 908172, 374829,
+        837192, 293847, 837465, 918273, 564738, 918374, 293847, 837192
+    ];
+
+    const ADMIN_CODE = "444";
+
+    let tickets = parseInt(localStorage.getItem("tickets")) || 0;
+    let usedCodes = JSON.parse(localStorage.getItem("usedCodes")) || [];
+
+    document.getElementById("tickets").innerText = "Ձեր տոմսերը՝ " + tickets;
+
+    function submitCode() {
+        const email = document.getElementById("email").value.trim();
+        const code = document.getElementById("code").value.trim();
+
+        if (!email) {
+            alert("Մուտքագրեք email");
+            return;
+        }
+
+        if (code === ADMIN_CODE) {
+            let newTickets = prompt("Մուտքագրեք նոր տոմսերի քանակը");
+            if (!isNaN(newTickets)) {
+                tickets = parseInt(newTickets);
+                localStorage.setItem("tickets", tickets);
+                document.getElementById("tickets").innerText = "Ձեր տոմսերը՝ " + tickets;
+            }
+            return;
+        }
+
+        if (VALID_CODES.includes(parseInt(code)) && !usedCodes.includes(code)) {
+            tickets++;
+            usedCodes.push(code);
+            localStorage.setItem("tickets", tickets);
+            localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
+            alert("Կոդը ընդունված է ✅");
+        } else {
+            alert("Սխալ կամ արդեն օգտագործված կոդ ❌");
+        }
+
+        document.getElementById("tickets").innerText = "Ձեր տոմսերը՝ " + tickets;
+    }
+
+    // ✅ Ֆոնի բաժակների անիմացիա
+    const drinks = ["🍹", "🥤", "🍸", "🧋"];
+    for (let i = 0; i < 30; i++) {
+        const div = document.createElement("div");
+        div.classList.add("cup");
+        div.style.left = Math.random() * 100 + "vw";
+        div.style.top = Math.random() * 100 + "vh";
+        div.style.animationDuration = 10 + Math.random() * 10 + "s";
+        div.innerText = drinks[Math.floor(Math.random() * drinks.length)];
+        document.getElementById("background").appendChild(div);
+    }
+</script>
+</body>
+</html>
